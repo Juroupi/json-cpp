@@ -1,10 +1,10 @@
 /**
  * Main header file for JSON library.
  */
-#include <JSON/error.h>
-#include <JSON/lexer.h>
-#include <JSON/parser.h>
-#include <JSON/path.h>
-#include <JSON/printer.h>
-#include <JSON/utils.h>
-#include <JSON/value.h>
+#include <json/error.h>
+#include <json/lexer.h>
+#include <json/parser.h>
+#include <json/path.h>
+#include <json/printer.h>
+#include <json/utils.h>
+#include <json/value.h>

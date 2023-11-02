@@ -6,9 +6,9 @@
 #include <map>
 #include <istream>
 #include <ostream>
-#include <JSON/error.h>
-#include <JSON/printer.h>
-#include <JSON/path.h>
+#include <json/error.h>
+#include <json/printer.h>
+#include <json/path.h>
 #include <json/path/cursor.h>
 
 namespace JSON {

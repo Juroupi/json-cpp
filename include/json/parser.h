@@ -1,9 +1,9 @@
 #ifndef _JSON_PARSER_H_
 #define _JSON_PARSER_H_
 
-#include <JSON/lexer.h>
-#include <JSON/error.h>
-#include <JSON/path.h>
+#include <json/lexer.h>
+#include <json/error.h>
+#include <json/path.h>
 #include <string>
 #include <istream>
 

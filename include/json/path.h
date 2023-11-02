@@ -84,6 +84,6 @@ public:
 
 std::ostream& operator<<(std::ostream& output, const JSON::Path& path);
 
-#include <JSON/path/element.h>
+#include <json/path/element.h>
 
 #endif

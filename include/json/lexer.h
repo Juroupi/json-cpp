@@ -4,7 +4,7 @@
 #include <istream>
 #include <ostream>
 #include <string>
-#include <JSON/error.h>
+#include <json/error.h>
 
 namespace JSON {
 
