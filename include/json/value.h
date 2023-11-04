@@ -6,6 +6,7 @@
 #include <map>
 #include <istream>
 #include <ostream>
+#include <json/type.h>
 #include <json/error.h>
 #include <json/printer.h>
 #include <json/path.h>
@@ -24,20 +25,6 @@ using String = std::string;
 using Null = std::nullptr_t;
 using Object = std::map<std::string, Value>;
 using Array = std::vector<Value>;
-
-/**
- * Enum for different JSON value type IDs.
- * Undefined is not a valid type but is used internally.
- */
-enum class Type {
-    UNDEFINED,
-    NUMBER,
-    BOOLEAN,
-    NULL_,
-    STRING,
-    OBJECT,
-    ARRAY
-};
 
 /**
  * The null value.
