@@ -10,6 +10,7 @@ namespace JSON {
 /**
  * A cursor to navigate through a JSON data tree.
  * The cursor is used to check if a value is in the path or in the target value during a search.
+ * If the path is modified, the cursor is invalid until reset() is called.
  */
 class Path::Cursor {
 
@@ -39,6 +40,11 @@ public:
      * Moves the cursor to parent of the current value.
      */
     void prev();
+
+    /**
+     * Resets the cursor to the root of the path.
+     */
+    void reset();
 
     /**
      * Test if the current value is in the path.

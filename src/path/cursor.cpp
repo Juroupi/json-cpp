@@ -57,6 +57,15 @@ void Path::Cursor::prev() {
     }
 }
 
+void Path::Cursor::reset() {
+    cursor = 0;
+    depth = 0;
+    diff = 0;
+    totalMatches = 0;
+    matches.clear();
+    matches.resize(path.getSize(), 0);
+}
+
 bool Path::Cursor::isInPath() const {
     return diff == 0;
 }
