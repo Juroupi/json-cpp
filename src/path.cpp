@@ -1,7 +1,7 @@
-#include <JSON/path.h>
-#include <JSON/path/lexer.h>
-#include <JSON/path/parser.h>
-#include <JSON/path/element.h>
+#include <json/path.h>
+#include <json/path/lexer.h>
+#include <json/path/parser.h>
+#include <json/path/element.h>
 
 namespace JSON {
 

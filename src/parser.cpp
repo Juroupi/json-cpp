@@ -1,6 +1,6 @@
-#include <JSON/parser.h>
-#include <JSON/lexer.h>
-#include <JSON/path/cursor.h>
+#include <json/parser.h>
+#include <json/lexer.h>
+#include <json/path/cursor.h>
 #include <sstream>
 
 namespace JSON {

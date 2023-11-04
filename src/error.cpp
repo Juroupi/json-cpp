@@ -1,4 +1,4 @@
-#include <JSON/error.h>
+#include <json/error.h>
 
 namespace JSON {
 

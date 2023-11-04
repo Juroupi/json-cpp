@@ -1,6 +1,6 @@
-#include <JSON/utils.h>
-#include <JSON/parser.h>
-#include <JSON/printer.h>
+#include <json/utils.h>
+#include <json/parser.h>
+#include <json/printer.h>
 
 namespace JSON {
 
