@@ -17,6 +17,7 @@ namespace JSON {
 class Parser {
 
     Lexer lexer;
+    bool delegated = false;
     
     void expectToken(Token expectedToken);
 
@@ -50,8 +51,16 @@ public:
     /**
      * Parse the given input stream.
      * The callbacks are called only for the content that is in the given path.
+     * This function must not be called while parsing is in progress (i.e. from a callback) in the same object.
      */
     void parse(std::istream& input, const Path& path = {});
+
+    /**
+     * Delegate the parsing of the incoming value to the given parser.
+     * This can be used to parse a sub-object in a different way than the parent object.
+     * This function can only be called from the callback onKey or onIndex of this parser.
+     */
+    void delegate(Parser& parser, const Path& path = {});
 
     /**
      * Callbacks that are called during parsing.

@@ -11,6 +11,14 @@ void Parser::parse(std::istream& input, const Path& path) {
     parseValue(cursor);
 }
 
+void Parser::delegate(Parser& parser, const Path& path) {
+    parser.lexer = lexer;
+    Path::Cursor cursor(path);
+    parser.parseValue(cursor);
+    lexer = parser.lexer;
+    delegated = true;
+}
+
 Parser::Error::Error(Token token, const Lexer& lexer) :
     token(token), linePos(lexer.getTokenLineNumber()), charPos(lexer.getTokenCharPos()) {
     std::ostringstream s;
@@ -76,14 +84,17 @@ void Parser::parseObject(Path::Cursor& cursor) {
             break;
         
         case Token::STRING:
+            expectToken(Token::COLON);
             if (cursor.isInTarget()) {
                 cursor.next(lexer.getStringValue());
                 onKey(lexer.getStringValue());
             } else {
                 cursor.next(lexer.getStringValue());
             }
-            expectToken(Token::COLON);
-            parseValue(cursor);
+            if (!delegated) {
+                parseValue(cursor);
+            }
+            delegated = false;
             cursor.prev();
             return parseNonEmptyObject(cursor);
 
@@ -103,14 +114,17 @@ void Parser::parseNonEmptyObject(Path::Cursor& cursor) {
         
         case Token::COMMA:
             expectToken(Token::STRING);
+            expectToken(Token::COLON);
             if (cursor.isInTarget()) {
                 cursor.next(lexer.getStringValue());
                 onKey(lexer.getStringValue());
             } else {
                 cursor.next(lexer.getStringValue());
             }
-            expectToken(Token::COLON);
-            parseValue(cursor);
+            if (!delegated) {
+                parseValue(cursor);
+            }
+            delegated = false;
             cursor.prev();
             return parseNonEmptyObject(cursor);
 
@@ -135,7 +149,10 @@ void Parser::parseArray(Path::Cursor& cursor) {
             } else {
                 cursor.next(0);
             }
-            parseValue(cursor, token);
+            if (!delegated) {
+                parseValue(cursor);
+            }
+            delegated = false;
             cursor.prev();
             return parseNonEmptyArray(cursor);
     }
@@ -157,7 +174,10 @@ void Parser::parseNonEmptyArray(Path::Cursor& cursor, size_t index) {
             } else {
                 cursor.next(index);
             }
-            parseValue(cursor);
+            if (!delegated) {
+                parseValue(cursor);
+            }
+            delegated = false;
             cursor.prev();
             return parseNonEmptyArray(cursor, index + 1);
 
