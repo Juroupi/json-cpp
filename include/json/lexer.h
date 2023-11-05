@@ -97,6 +97,7 @@ public:
 
     /**
      * Set the input stream to read from.
+     * Reset the lexer to the initial state.
      */
     void setInput(std::istream& input);
     
