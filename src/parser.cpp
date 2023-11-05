@@ -6,9 +6,9 @@
 namespace JSON {
 
 void Parser::parse(std::istream& input, const Path& path) {
-    Lexer lexer(input);
+    lexer.setInput(input);
     Path::Cursor cursor(path);
-    parseValue(lexer, cursor);
+    parseValue(cursor);
 }
 
 Parser::Error::Error(Token token, const Lexer& lexer) :
@@ -18,30 +18,30 @@ Parser::Error::Error(Token token, const Lexer& lexer) :
     message = s.str();
 }
 
-void Parser::expectToken(Lexer& lexer, Token expectedToken) {
+void Parser::expectToken(Token expectedToken) {
     Token token = lexer.getNextToken();
     if (token != expectedToken) {
         throw Error(token, lexer);
     }
 }
 
-void Parser::parseValue(Lexer& lexer, Path::Cursor& cursor) {
-    parseValue(lexer, cursor, lexer.getNextToken());
+void Parser::parseValue(Path::Cursor& cursor) {
+    parseValue(cursor, lexer.getNextToken());
 }
 
-void Parser::parseValue(Lexer& lexer, Path::Cursor& cursor, Token token) {
+void Parser::parseValue(Path::Cursor& cursor, Token token) {
     
     switch (token) {
 
         case Token::OBJECT_START:
             if (cursor.isInTarget()) onObjectStart();
-            parseObject(lexer, cursor);
+            parseObject(cursor);
             if (cursor.isInTarget()) onObjectEnd();
             break;
         
         case Token::ARRAY_START:
             if (cursor.isInTarget()) onArrayStart();
-            parseArray(lexer, cursor);
+            parseArray(cursor);
             if (cursor.isInTarget()) onArrayEnd();
             break;
         
@@ -66,7 +66,7 @@ void Parser::parseValue(Lexer& lexer, Path::Cursor& cursor, Token token) {
     }
 }
 
-void Parser::parseObject(Lexer& lexer, Path::Cursor& cursor) {
+void Parser::parseObject(Path::Cursor& cursor) {
 
     Token token = lexer.getNextToken();
     
@@ -82,17 +82,17 @@ void Parser::parseObject(Lexer& lexer, Path::Cursor& cursor) {
             } else {
                 cursor.next(lexer.getStringValue());
             }
-            expectToken(lexer, Token::COLON);
-            parseValue(lexer, cursor);
+            expectToken(Token::COLON);
+            parseValue(cursor);
             cursor.prev();
-            return parseNonEmptyObject(lexer, cursor);
+            return parseNonEmptyObject(cursor);
 
         default:
             throw Error(token, lexer);
     }
 }
 
-void Parser::parseNonEmptyObject(Lexer& lexer, Path::Cursor& cursor) {
+void Parser::parseNonEmptyObject(Path::Cursor& cursor) {
 
     Token token = lexer.getNextToken();
     
@@ -102,24 +102,24 @@ void Parser::parseNonEmptyObject(Lexer& lexer, Path::Cursor& cursor) {
             break;
         
         case Token::COMMA:
-            expectToken(lexer, Token::STRING);
+            expectToken(Token::STRING);
             if (cursor.isInTarget()) {
                 cursor.next(lexer.getStringValue());
                 onKey(lexer.getStringValue());
             } else {
                 cursor.next(lexer.getStringValue());
             }
-            expectToken(lexer, Token::COLON);
-            parseValue(lexer, cursor);
+            expectToken(Token::COLON);
+            parseValue(cursor);
             cursor.prev();
-            return parseNonEmptyObject(lexer, cursor);
+            return parseNonEmptyObject(cursor);
 
         default:
             throw Error(token, lexer);
     }
 }
 
-void Parser::parseArray(Lexer& lexer, Path::Cursor& cursor) {
+void Parser::parseArray(Path::Cursor& cursor) {
 
     Token token = lexer.getNextToken();
 
@@ -135,13 +135,13 @@ void Parser::parseArray(Lexer& lexer, Path::Cursor& cursor) {
             } else {
                 cursor.next(0);
             }
-            parseValue(lexer, cursor, token);
+            parseValue(cursor, token);
             cursor.prev();
-            return parseNonEmptyArray(lexer, cursor);
+            return parseNonEmptyArray(cursor);
     }
 }
 
-void Parser::parseNonEmptyArray(Lexer& lexer, Path::Cursor& cursor, size_t index) {
+void Parser::parseNonEmptyArray(Path::Cursor& cursor, size_t index) {
 
     Token token = lexer.getNextToken();
     
@@ -157,9 +157,9 @@ void Parser::parseNonEmptyArray(Lexer& lexer, Path::Cursor& cursor, size_t index
             } else {
                 cursor.next(index);
             }
-            parseValue(lexer, cursor);
+            parseValue(cursor);
             cursor.prev();
-            return parseNonEmptyArray(lexer, cursor, index + 1);
+            return parseNonEmptyArray(cursor, index + 1);
 
         default:
             throw Error(token, lexer);

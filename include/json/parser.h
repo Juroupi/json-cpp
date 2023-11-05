@@ -15,15 +15,17 @@ namespace JSON {
  * in the order that the tokens are read from the input.
  */
 class Parser {
-    
-    void expectToken(Lexer& lexer, Token expectedToken);
 
-    void parseValue(Lexer& lexer, Path::Cursor& cursor);
-    void parseValue(Lexer& lexer, Path::Cursor& cursor, Token token);
-    void parseObject(Lexer& lexer, Path::Cursor& cursor);
-    void parseNonEmptyObject(Lexer& lexer, Path::Cursor& cursor);
-    void parseArray(Lexer& lexer, Path::Cursor& cursor);
-    void parseNonEmptyArray(Lexer& lexer, Path::Cursor& cursor, size_t index = 1);
+    Lexer lexer;
+    
+    void expectToken(Token expectedToken);
+
+    void parseValue(Path::Cursor& cursor);
+    void parseValue(Path::Cursor& cursor, Token token);
+    void parseObject(Path::Cursor& cursor);
+    void parseNonEmptyObject(Path::Cursor& cursor);
+    void parseArray(Path::Cursor& cursor);
+    void parseNonEmptyArray(Path::Cursor& cursor, size_t index = 1);
 
 public:
 
