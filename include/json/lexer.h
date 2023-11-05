@@ -68,10 +68,10 @@ public:
 
 private:
 
-    std::istream& input;
-    int charPos = 0, lineNumber = 1;
-    int tokenCharPos = charPos, tokenLineNumber = lineNumber;
-    bool carriageReturn = false;
+    std::istream* input;
+    int charPos, lineNumber;
+    int tokenCharPos, tokenLineNumber;
+    bool carriageReturn;
 
     double numberValue;
     std::string stringValue;
@@ -86,12 +86,23 @@ private:
 public:
 
     /**
+     * Construct a new Lexer object.
+     */
+    Lexer();
+
+    /**
      * Construct a new Lexer object that reads from the given input stream.
      */
     Lexer(std::istream& input);
+
+    /**
+     * Set the input stream to read from.
+     */
+    void setInput(std::istream& input);
     
     /**
      * Get the next token from the input stream.
+     * If the input stream is not set, Token::END_OF_STREAM is returned.
      */
     Token getNextToken();
 

@@ -5,8 +5,21 @@
 
 namespace JSON {
 
-Lexer::Lexer(std::istream& input) :
-    input(input) {}
+Lexer::Lexer() :
+    input(nullptr) {}
+
+Lexer::Lexer(std::istream& input) {
+    setInput(input);
+}
+
+void Lexer::setInput(std::istream& input) {
+    this->input = &input;
+    charPos = 0;
+    lineNumber = 1;
+    tokenCharPos = charPos;
+    tokenLineNumber = lineNumber;
+    carriageReturn = false;
+}
 
 double Lexer::getNumberValue() const {
     return numberValue;
@@ -46,7 +59,12 @@ void Lexer::nextLine() {
 }
 
 char Lexer::getNextChar() {
-    return charPos++, input.get();
+    char c;
+    if (input != nullptr && input->get(c)) {
+        charPos++;
+        return c;
+    }
+    return '\0';
 }
 
 Lexer::Error::Error(Code code, const Lexer& lexer, char c) : code(code), lineNumber(lexer.getLineNumber()), charPos(lexer.getCharPos()), c(c) {
@@ -92,7 +110,7 @@ Token Lexer::getNextToken() {
     tokenCharPos = charPos;
     tokenLineNumber = lineNumber;
 
-    if (c == EOF) {
+    if (c == '\0') {
         return Token::END_OF_STREAM;
     }
 
@@ -213,7 +231,7 @@ void Lexer::getNextNumber(char c) {
 
     charPos--;
     
-    input.unget();
+    input->unget();
 }
 
 void Lexer::getNextString() {
@@ -226,7 +244,7 @@ void Lexer::getNextString() {
 
         char c = getNextChar();
 
-        if (c == EOF) {
+        if (c == '\0') {
             throw Error(Error::UNTERMINATED_STRING, *this);
         }
 
