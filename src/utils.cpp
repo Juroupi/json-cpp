@@ -28,6 +28,10 @@ class CopyParser : public JSON::Parser {
         printer.key(key);
     }
 
+    void onIndex(size_t index) override {
+
+    }
+
     void onNumber(double value) override {
         printer.value(value);
     }
@@ -60,6 +64,7 @@ class ValidateParser : public JSON::Parser {
     void onArrayStart() override {}
     void onArrayEnd() override {}
     void onKey(std::string& key) override {}
+    void onIndex(size_t index) override {}
     void onNumber(double value) override {}
     void onBoolean(bool value) override {}
     void onString(std::string& value) override {}

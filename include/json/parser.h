@@ -59,6 +59,7 @@ public:
     virtual void onArrayStart() = 0;
     virtual void onArrayEnd() = 0;
     virtual void onKey(std::string& key) = 0;
+    virtual void onIndex(size_t index) = 0;
     virtual void onNumber(double number) = 0;
     virtual void onBoolean(bool boolean) = 0;
     virtual void onString(std::string& string) = 0;

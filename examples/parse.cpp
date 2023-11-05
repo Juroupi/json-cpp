@@ -41,6 +41,11 @@ class TestParser : public JSON::Parser {
         std::cout << "key: " << key << std::endl;
     }
 
+    void onIndex(size_t index) override {
+        printTabs();
+        std::cout << "index: " << index << std::endl;
+    }
+
     void onNumber(double value) override {
         printTabs();
         std::cout << "number: " << value << std::endl;

@@ -235,6 +235,10 @@ class ValueParser : public Parser {
         this->key = std::move(key);
     }
 
+    void onIndex(size_t index) override {
+
+    }
+
     void onObjectStart() override {
         checkStack();
         switch (stack.back()->getType()) {

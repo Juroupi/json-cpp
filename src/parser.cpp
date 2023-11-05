@@ -129,7 +129,12 @@ void Parser::parseArray(Lexer& lexer, Path::Cursor& cursor) {
             break;
 
         default:
-            cursor.next(0);
+            if (cursor.isInTarget()) {
+                cursor.next(0);
+                onIndex(0);
+            } else {
+                cursor.next(0);
+            }
             parseValue(lexer, cursor, token);
             cursor.prev();
             return parseNonEmptyArray(lexer, cursor);
@@ -146,7 +151,12 @@ void Parser::parseNonEmptyArray(Lexer& lexer, Path::Cursor& cursor, size_t index
             break;
         
         case Token::COMMA:
-            cursor.next(index);
+            if (cursor.isInTarget()) {
+                cursor.next(index);
+                onIndex(index);
+            } else {
+                cursor.next(index);
+            }
             parseValue(lexer, cursor);
             cursor.prev();
             return parseNonEmptyArray(lexer, cursor, index + 1);
