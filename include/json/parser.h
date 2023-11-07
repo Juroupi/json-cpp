@@ -18,6 +18,7 @@ class Parser {
 
     Lexer lexer;
     bool delegated = false;
+    size_t depth;
     
     void expectToken(Token expectedToken);
 
@@ -47,6 +48,12 @@ public:
 
         Error(Token token, const Lexer& lexer);
     };
+
+    /**
+     * Get the current depth of the parser.
+     * It is incremented after every call to onObjectStart or onArrayStart and decremented before onObjectEnd or onArrayEnd.
+     */
+    size_t getDepth() const;
 
     /**
      * Parse the given input stream.

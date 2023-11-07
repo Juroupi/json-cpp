@@ -5,13 +5,19 @@
 
 namespace JSON {
 
+size_t Parser::getDepth() const {
+    return depth;
+}
+
 void Parser::parse(std::istream& input, const Path& path) {
+    depth = 0;
     lexer.setInput(input);
     Path::Cursor cursor(path);
     parseValue(cursor);
 }
 
 void Parser::delegate(Parser& parser, const Path& path) {
+    parser.depth = 0;
     parser.lexer = lexer;
     Path::Cursor cursor(path);
     parser.parseValue(cursor);
@@ -43,13 +49,17 @@ void Parser::parseValue(Path::Cursor& cursor, Token token) {
 
         case Token::OBJECT_START:
             if (cursor.isInTarget()) onObjectStart();
+            depth++;
             parseObject(cursor);
+            depth--;
             if (cursor.isInTarget()) onObjectEnd();
             break;
         
         case Token::ARRAY_START:
             if (cursor.isInTarget()) onArrayStart();
+            depth++;
             parseArray(cursor);
+            depth--;
             if (cursor.isInTarget()) onArrayEnd();
             break;
         
