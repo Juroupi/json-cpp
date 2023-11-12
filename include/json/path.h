@@ -42,6 +42,16 @@ public:
      * Creates an empty path.
      */
     Path() = default;
+
+    /**
+     * Creates a copy of the given path.
+     */
+    Path(const Path& path);
+
+    /**
+     * Moves the given path to a new path.
+     */
+    Path(Path&& path);
     
     /**
      * Creates a path from a string representation.

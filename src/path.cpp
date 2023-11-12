@@ -5,6 +5,15 @@
 
 namespace JSON {
 
+Path::Path(const Path& path) {
+    for (const auto& element : path.elements) {
+        elements.emplace_back(element->copy());
+    }
+}
+
+Path::Path(Path&& path) :
+    elements(std::move(path.elements)) {}
+
 Path::Path(const std::string& path) {
     Parser(*this, path).parse();
 }

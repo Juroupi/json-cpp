@@ -58,16 +58,32 @@ void JSON::Path::Element::Name::print(std::ostream& output) const {
     output << '\"' << *this << '\"';
 }
 
+std::unique_ptr<Path::Element> JSON::Path::Element::Name::copy() const {
+    return std::make_unique<Name>(*this);
+}
+
 void JSON::Path::Element::Index::print(std::ostream& output) const {
     output << index;
+}
+
+std::unique_ptr<Path::Element> JSON::Path::Element::Index::copy() const {
+    return std::make_unique<Index>(*this);
 }
 
 void JSON::Path::Element::Any::print(std::ostream& output) const {
     output << '*';
 }
 
+std::unique_ptr<Path::Element> JSON::Path::Element::Any::copy() const {
+    return std::make_unique<Any>(*this);
+}
+
 void JSON::Path::Element::Function::print(std::ostream& output) const {
     output << "f(@)";
+}
+
+std::unique_ptr<Path::Element> JSON::Path::Element::Function::copy() const {
+    return std::make_unique<Function>(*this);
 }
 
 void JSON::Path::Element::Range::print(std::ostream& output) const {
@@ -77,10 +93,18 @@ void JSON::Path::Element::Range::print(std::ostream& output) const {
     }
 }
 
+std::unique_ptr<Path::Element> JSON::Path::Element::Range::copy() const {
+    return std::make_unique<Range>(*this);
+}
+
 void JSON::Path::Element::Options::print(std::ostream& output) const {
     first->print(output);
     output << ", ";
     second->print(output);
+}
+
+std::unique_ptr<Path::Element> JSON::Path::Element::Options::copy() const {
+    return std::make_unique<Options>(first->copy(), second->copy());
 }
 
 }

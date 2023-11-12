@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <ostream>
+#include <memory>
 #include <functional>
 
 namespace JSON {
@@ -21,6 +22,7 @@ struct Path::Element {
     virtual bool accept(const std::string& name) const;
     virtual bool accept(size_t index) const;
     virtual void print(std::ostream& output) const = 0;
+    virtual std::unique_ptr<Element> copy() const = 0;
 
     struct Name;
     struct Index;
@@ -37,6 +39,7 @@ struct Path::Element::Name : Path::Element, std::string {
     using std::string::string;
     bool accept(const std::string& name) const override;
     void print(std::ostream& output) const override;
+    std::unique_ptr<Element> copy() const override;
 };
 
 /**
@@ -47,6 +50,7 @@ struct Path::Element::Index : Path::Element {
     Index(size_t index);
     bool accept(size_t index) const override;
     void print(std::ostream& output) const override;
+    std::unique_ptr<Element> copy() const override;
 };
 
 /**
@@ -57,6 +61,7 @@ struct Path::Element::Range : Path::Element {
     Range(size_t first, size_t last, size_t step = 1);
     bool accept(size_t index) const override;
     void print(std::ostream& output) const override;
+    std::unique_ptr<Element> copy() const override;
 };
 
 /**
@@ -67,6 +72,7 @@ struct Path::Element::Options : Path::Element, std::pair<std::unique_ptr<Element
     bool accept(const std::string& name) const override;
     bool accept(size_t index) const override;
     void print(std::ostream& output) const override;
+    std::unique_ptr<Element> copy() const override;
 };
 
 /**
@@ -76,6 +82,7 @@ struct Path::Element::Any : Path::Element {
     bool accept(const std::string& name) const override;
     bool accept(size_t index) const override;
     void print(std::ostream& output) const override;
+    std::unique_ptr<Element> copy() const override;
 };
 
 /**
@@ -88,6 +95,7 @@ struct Path::Element::Function : Path::Element, std::pair<std::function<bool(con
     bool accept(const std::string& name) const override;
     bool accept(size_t index) const override;
     void print(std::ostream& output) const override;
+    std::unique_ptr<Element> copy() const override;
 };
 
 }
