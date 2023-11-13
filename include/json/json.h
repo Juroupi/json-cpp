@@ -9,3 +9,4 @@
 #include <json/printer.h>
 #include <json/utils.h>
 #include <json/value.h>
+#include <json/struct.h>
