@@ -8,6 +8,7 @@ A library for reading, writing, and manipulating JSON data in C++.
 - Read any valid JSON data from a stream.
 - Write data to a stream with customizable formatting.
 - Find values using paths in `JSON::Value` objects or in streams.
+- Read custom data structure using `JSON::Struct`.
 - Syntax errors are reported with line and column numbers.
 - The lexer and parser can be used independently of the rest of the library.
 
