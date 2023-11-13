@@ -5,6 +5,10 @@ namespace JSON {
 Path::Cursor::Cursor(const Path& path) :
     path(path), matches(path.getSize(), 0) {}
 
+size_t Path::Cursor::getDepth() const {
+    return depth;
+}
+
 void Path::Cursor::next(const std::string& name) {
     if (diff > 0) {
         diff++;

@@ -31,6 +31,11 @@ public:
     Cursor(const Path& path);
 
     /**
+     * Returns the depth of the current value.
+     */
+    size_t getDepth() const;
+
+    /**
      * Moves the cursor to the child of the current value with the given name or index.
      */
     void next(const std::string& name);
