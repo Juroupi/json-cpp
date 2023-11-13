@@ -31,6 +31,11 @@ public:
     Cursor(const Path& path);
 
     /**
+     * Returns the path of the cursor.
+     */
+    const Path& getPath() const;
+
+    /**
      * Returns the depth of the current value.
      */
     size_t getDepth() const;
