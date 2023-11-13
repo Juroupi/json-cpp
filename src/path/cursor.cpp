@@ -74,4 +74,8 @@ bool Path::Cursor::isInTarget() const {
     return cursor >= path.getSize();
 }
 
+bool Path::Cursor::isInTargetRoot() const {
+    return cursor == path.getSize();
+}
+
 }

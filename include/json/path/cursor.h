@@ -56,6 +56,11 @@ public:
      * If it is true, isInPath() is also true.
      */
     bool isInTarget() const;
+
+    /**
+     * Test if the current value is the root of the target value.
+     */
+    bool isInTargetRoot() const;
 };
 
 }
