@@ -160,7 +160,7 @@ void Parser::parseArray(Path::Cursor& cursor) {
                 cursor.next(0);
             }
             if (!delegated) {
-                parseValue(cursor);
+                parseValue(cursor, token);
             }
             delegated = false;
             cursor.prev();
