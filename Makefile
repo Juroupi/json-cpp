@@ -1,4 +1,4 @@
-bin/libjson.a: bin/error.o bin/lexer.o bin/parser.o bin/printer.o bin/value.o bin/utils.o \
+bin/libjson.a: bin/error.o bin/lexer.o bin/parser.o bin/printer.o bin/value.o bin/utils.o bin/struct.o \
             bin/path.o bin/path/lexer.o bin/path/parser.o bin/path/cursor.o bin/path/element.o
 	ar -rsc $@ $^
 

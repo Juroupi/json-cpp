@@ -1,4 +1,4 @@
-EXAMPLES = lex parse print copy value load check load_path find delegate_parser
+EXAMPLES = lex parse print copy value load check load_path find delegate_parser struct
 
 examples: $(EXAMPLES)
 
