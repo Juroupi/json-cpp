@@ -27,7 +27,7 @@ struct StructFieldInfos : std::vector<StructFieldInfo> {
     void setDefaults(void* base) {
         for (StructFieldInfo& fieldInfo : *this) {
             if (fieldInfo.count == 0 && fieldInfo.field.setDefault != nullptr) {
-                fieldInfo.field.setDefault(base, fieldInfo.field.offset);
+                fieldInfo.field.setDefault(fieldInfo.field.getPointer(base));
             }
         }
     }
@@ -42,7 +42,7 @@ class StructParser : public Parser {
     void trySetPrimitive(Type type, void* value) {
         for (StructFieldInfo& fieldInfo : fieldInfos) {
             if (fieldInfo.field.setPrimitive != nullptr && fieldInfo.cursor.isInTarget()) {
-                if ((*fieldInfo.field.setPrimitive)(base, fieldInfo.field.offset, fieldInfo.count, type, value)) {
+                if ((*fieldInfo.field.setPrimitive)(fieldInfo.field.getPointer(base), fieldInfo.count, type, value)) {
                     fieldInfo.count++;
                     return;
                 }
@@ -50,8 +50,8 @@ class StructParser : public Parser {
         }
     }
 
-    void delegateStruct(size_t offset, Struct& subStruct) {
-        void* subBase = (unsigned char*)base + offset;
+    void delegateStruct(Struct::FieldGetter getField, Struct& subStruct) {
+        void* subBase = getField(base);
         StructFieldInfos subFieldInfos(subStruct.getFields());
         StructParser subParser(subBase, subFieldInfos);
         Parser::delegate(subParser);
@@ -61,7 +61,7 @@ class StructParser : public Parser {
     void trySetStruct() {
         for (StructFieldInfo& fieldInfo : fieldInfos) {
             if (fieldInfo.field.subStruct != nullptr && fieldInfo.cursor.isInTargetRoot()) {
-                delegateStruct(fieldInfo.field.offset, *fieldInfo.field.subStruct);
+                delegateStruct(fieldInfo.field.getPointer, *fieldInfo.field.subStruct);
                 fieldInfo.count++;
                 prev();
                 return;
@@ -123,11 +123,11 @@ public:
 };
 
 
-Struct::Field::Field(Path path, size_t offset, PrimitiveSetter setPrimitive, DefaultSetter setDefault) :
-    path(std::move(path)), offset(offset), setPrimitive(setPrimitive), subStruct(nullptr), setDefault(setDefault) {}
+Struct::Field::Field(Path path, FieldGetter getPointer, PrimitiveSetter setPrimitive, DefaultSetter setDefault) :
+    path(std::move(path)), getPointer(getPointer), setPrimitive(setPrimitive), subStruct(nullptr), setDefault(setDefault) {}
 
-Struct::Field::Field(Path path, size_t offset, Struct& subStruct, DefaultSetter setDefault) :
-    path(std::move(path)), offset(offset), setPrimitive(nullptr), subStruct(&subStruct), setDefault(setDefault) {}
+Struct::Field::Field(Path path, FieldGetter getPointer, Struct& subStruct, DefaultSetter setDefault) :
+    path(std::move(path)), getPointer(getPointer), setPrimitive(nullptr), subStruct(&subStruct), setDefault(setDefault) {}
 
 
 Struct::Struct(std::initializer_list<Field> fields) :
@@ -144,28 +144,28 @@ void Struct::parse(void* base, std::istream& input, const Path& path) {
     fieldInfos.setDefaults(base);
 }
 
-static bool setCharPrimitive(void* base, size_t offset, int count, Type type, void* value) {
+static bool setCharPrimitive(void* field, int count, Type type, void* value) {
     if (type == Type::STRING) {
         std::string& stringValue = *(std::string*)value;
         if (stringValue.length() == 1) {
-            ((char*)base)[offset] = stringValue[0];
+            *(char*)field = stringValue[0];
             return true;
         }
     }
     return false;
 }
 
-static bool setStringPrimitive(void* base, size_t offset, int count, Type type, void* value) {
+static bool setStringPrimitive(void* field, int count, Type type, void* value) {
     if (type == Type::STRING) {
-        *(std::string*)((unsigned char*)base + offset) = *(std::string*)value;
+        *(std::string*)field = *(std::string*)value;
         return true;
     }
     return false;
 }
 
-static bool setBooleanPrimitive(void* base, size_t offset, int count, Type type, void* value) {
+static bool setBooleanPrimitive(void* field, int count, Type type, void* value) {
     if (type == Type::BOOLEAN) {
-        *(bool*)((unsigned char*)base + offset) = *(bool*)value;
+        *(bool*)field = *(bool*)value;
         return true;
     }
     return false;
@@ -175,7 +175,7 @@ const Struct::PrimitiveSetter Struct::CHAR = &setCharPrimitive;
 const Struct::PrimitiveSetter Struct::STRING = &setStringPrimitive;
 const Struct::PrimitiveSetter Struct::BOOLEAN = &setBooleanPrimitive;
 
-static void setMandatoryDefault(void* base, size_t offset) {
+static void setMandatoryDefault(void* field) {
     throw std::runtime_error("Mandatory field not found");
 }
 

@@ -28,15 +28,15 @@ int main() {
     })";
 
     JSON::Struct bStruct {
-        { "['b1']", offsetof(B, b1), JSON::Struct::NUMBER<int> },
-        { "['b2']", offsetof(B, b2), JSON::Struct::NUMBER<float> }
+        { "['b1']", JSON::Struct::OFFSET<offsetof(B, b1)>, JSON::Struct::NUMBER<int> },
+        { "['b2']", JSON::Struct::OFFSET<offsetof(B, b2)>, JSON::Struct::NUMBER<float> }
     };
 
     JSON::Struct aStruct {
-        { "['a1']", offsetof(A, a1), JSON::Struct::BOOLEAN },
-        { "['a2']", offsetof(A, a2), JSON::Struct::STRING },
-        { "['a3'][2]", offsetof(A, a3), JSON::Struct::NUMBER<int>, JSON::Struct::DEFAULT<int, 7> },
-        { "['sub']", offsetof(A, sub), bStruct }
+        { "['a1']", JSON::Struct::OFFSET<offsetof(A, a1)>, JSON::Struct::BOOLEAN },
+        { "['a2']", JSON::Struct::OFFSET<offsetof(A, a2)>, JSON::Struct::STRING },
+        { "['a3'][2]", JSON::Struct::OFFSET<offsetof(A, a3)>, JSON::Struct::NUMBER<int>, JSON::Struct::DEFAULT<int, 7> },
+        { "['sub']", JSON::Struct::OFFSET<offsetof(A, sub)>, bStruct }
     };
 
     auto input = std::istringstream(str);

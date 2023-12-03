@@ -17,19 +17,23 @@ class Struct {
 public:
 
     /**
+     * A function that gets a field from a struct.
+     */
+    using FieldGetter = void* (*)(void* base);
+
+    /**
      * A function that sets a primitive value for a field in a struct.
-     * The base pointer is the pointer to the structure to be filled.
-     * The offset is the offset of the field in the struct (obtained with offsetof).
+     * The field pointer is the pointer to the field in the struct.
      * The count is the number of times the field has been found.
      * The type is the type of the value : NUMBER, BOOLEAN, STRING or NULL_.
      * The value is the value to set : double* for NUMBER, bool* for BOOLEAN, std::string* for STRING and nullptr for NULL_.
      */
-    using PrimitiveSetter = bool (*)(void* base, size_t offset, int count, Type type, void* value);
+    using PrimitiveSetter = bool (*)(void* field, int count, Type type, void* value);
 
     /**
      * A function that sets a default value for a field in a struct.
      */
-    using DefaultSetter = void (*)(void* base, size_t offset);
+    using DefaultSetter = void (*)(void* field);
 
     /**
      * A struct field.
@@ -43,10 +47,10 @@ public:
         Path path;
 
         /**
-         * The offset of the field in the struct.
-         * Can be obtained with offsetof.
+         * The getter for the field.
+         * Called once just before the setter to get the pointer to the field.
          */
-        size_t offset;
+        FieldGetter getPointer;
 
         /**
          * The setter for the field if it is a primitive type.
@@ -67,13 +71,21 @@ public:
         /**
          * Constructs a primitive field.
          */
-        Field(Path path, size_t offset, PrimitiveSetter setPrimitive, DefaultSetter setDefault = nullptr);
+        Field(Path path, FieldGetter getPointer, PrimitiveSetter setPrimitive, DefaultSetter setDefault = nullptr);
 
         /**
          * Constructs a struct field.
          */
-        Field(Path path, size_t offset, Struct& subStruct, DefaultSetter setDefault = nullptr);
+        Field(Path path, FieldGetter getPointer, Struct& subStruct, DefaultSetter setDefault = nullptr);
     };
+
+    /**
+     * A getter for a field at a given offset.
+     */
+    template<size_t offset>
+    static void* OFFSET(void* base) {
+        return (void*)((unsigned char*)base + offset);
+    }
     
     /**
      * Some setters for char, std::string and bool.
@@ -84,9 +96,9 @@ public:
      * A setter for numbers (int, long, float, double, ...).
      */
     template<typename NumberType>
-    static bool NUMBER(void* base, size_t offset, int count, Type type, void* value) {
+    static bool NUMBER(void* field, int count, Type type, void* value) {
         if (type == Type::NUMBER) {
-            *(NumberType*)((unsigned char*)base + offset) = (NumberType)*(double*)value;
+            *(NumberType*)field = (NumberType)(*(double*)value);
             return true;
         }
         return false;
@@ -101,8 +113,8 @@ public:
      * A simple default setter that sets the field to a default value.
      */
     template<typename Type, Type defaultValue>
-    static void DEFAULT(void* base, size_t offset) {
-        *(Type*)((unsigned char*)base + offset) = defaultValue;
+    static void DEFAULT(void* field) {
+        *(Type*)field = defaultValue;
     }
 
 protected:
