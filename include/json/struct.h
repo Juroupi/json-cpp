@@ -86,6 +86,16 @@ public:
     static void* OFFSET(void* base) {
         return (void*)((unsigned char*)base + offset);
     }
+
+    /**
+     * A getter for a std::vector field that appends a new element.
+     */
+    template<typename Type, FieldGetter getPointer>
+    static void* VECTOR_APPEND(void* base) {
+        std::vector<Type>& vector = *(std::vector<Type>*)getPointer(base);
+        vector.emplace_back();
+        return &vector.back();
+    }
     
     /**
      * Some setters for char, std::string and bool.
