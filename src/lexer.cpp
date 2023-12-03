@@ -6,7 +6,8 @@
 namespace JSON {
 
 Lexer::Lexer() :
-    input(nullptr) {}
+    input(nullptr),
+    token(Token::END_OF_STREAM) {}
 
 Lexer::Lexer(std::istream& input) {
     setInput(input);
@@ -19,6 +20,7 @@ void Lexer::setInput(std::istream& input) {
     tokenCharPos = charPos;
     tokenLineNumber = lineNumber;
     carriageReturn = false;
+    nextToken();
 }
 
 double Lexer::getNumberValue() const {
@@ -165,6 +167,14 @@ Token Lexer::getNextToken() {
     }
 
     throw Error(Error::INVALID_CHARACTER, *this, c);
+}
+
+void Lexer::nextToken() {
+    token = getNextToken();
+}
+
+Token Lexer::getToken() const {
+    return token;
 }
 
 void Lexer::getNextNumber(char c) {

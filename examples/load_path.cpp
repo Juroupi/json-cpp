@@ -16,6 +16,7 @@ void printValue(const JSON::Path& path, bool unique) {
     }
     std::cout << std::endl;
 
+    input.clear();
     input.seekg(0);
 }
 

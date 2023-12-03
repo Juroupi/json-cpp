@@ -23,7 +23,6 @@ class Parser {
     void expectToken(Token expectedToken);
 
     void parseValue(Path::Cursor& cursor);
-    void parseValue(Path::Cursor& cursor, Token token);
     void parseObject(Path::Cursor& cursor);
     void parseNonEmptyObject(Path::Cursor& cursor);
     void parseArray(Path::Cursor& cursor);
@@ -46,7 +45,7 @@ public:
          */
         int linePos, charPos;
 
-        Error(Token token, const Lexer& lexer);
+        Error(const Lexer& lexer);
     };
 
     /**

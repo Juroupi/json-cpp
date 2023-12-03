@@ -8,10 +8,9 @@ int main() {
 
     JSON::Lexer lexer(stream);
 
-    JSON::Token token;
-
-    while ((token = lexer.getNextToken()) != JSON::Token::END_OF_STREAM) {
-        std::cout << token << " ";
+    while (lexer.getToken() != JSON::Token::END_OF_STREAM) {
+        std::cout << lexer.getToken() << " ";
+        lexer.nextToken();
     }
 
     std::cout << std::endl;

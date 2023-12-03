@@ -25,27 +25,23 @@ void Parser::delegate(Parser& parser, const Path& path) {
     delegated = true;
 }
 
-Parser::Error::Error(Token token, const Lexer& lexer) :
-    token(token), linePos(lexer.getTokenLineNumber()), charPos(lexer.getTokenCharPos()) {
+Parser::Error::Error(const Lexer& lexer) :
+    token(lexer.getToken()), linePos(lexer.getTokenLineNumber()), charPos(lexer.getTokenCharPos()) {
     std::ostringstream s;
     s << "unexpected token " << token << " at line " << linePos << " (char " << charPos << ")";
     message = s.str();
 }
 
 void Parser::expectToken(Token expectedToken) {
-    Token token = lexer.getNextToken();
-    if (token != expectedToken) {
-        throw Error(token, lexer);
+    if (lexer.getToken() != expectedToken) {
+        throw Error(lexer);
     }
+    lexer.nextToken();
 }
 
 void Parser::parseValue(Path::Cursor& cursor) {
-    parseValue(cursor, lexer.getNextToken());
-}
-
-void Parser::parseValue(Path::Cursor& cursor, Token token) {
     
-    switch (token) {
+    switch (lexer.getToken()) {
 
         case Token::OBJECT_START:
             if (cursor.isInTarget()) onObjectStart();
@@ -65,41 +61,50 @@ void Parser::parseValue(Path::Cursor& cursor, Token token) {
         
         case Token::NUMBER:
             if (cursor.isInTarget()) onNumber(lexer.getNumberValue());
+            lexer.nextToken();
             break;
 
         case Token::BOOLEAN:
             if (cursor.isInTarget()) onBoolean(lexer.getBooleanValue());
+            lexer.nextToken();
             break;
         
         case Token::STRING:
             if (cursor.isInTarget()) onString(lexer.getStringValue());
+            lexer.nextToken();
             break;
 
         case Token::NULL_:
             if (cursor.isInTarget()) onNull();
+            lexer.nextToken();
             break;
         
         default:
-            throw Error(token, lexer);
+            throw Error(lexer);
     }
 }
 
 void Parser::parseObject(Path::Cursor& cursor) {
 
-    Token token = lexer.getNextToken();
+    lexer.nextToken();
     
-    switch (token) {
+    switch (lexer.getToken()) {
 
         case Token::OBJECT_END:
+            lexer.nextToken();
             break;
-        
+
         case Token::STRING:
-            expectToken(Token::COLON);
-            if (cursor.isInTarget()) {
-                cursor.next(lexer.getStringValue());
-                onKey(lexer.getStringValue());
-            } else {
-                cursor.next(lexer.getStringValue());
+            {
+                std::string key = std::move(lexer.getStringValue());
+                lexer.nextToken();
+                expectToken(Token::COLON);
+                if (cursor.isInTarget()) {
+                    cursor.next(key);
+                    onKey(key);
+                } else {
+                    cursor.next(key);
+                }
             }
             if (!delegated) {
                 parseValue(cursor);
@@ -109,27 +114,30 @@ void Parser::parseObject(Path::Cursor& cursor) {
             return parseNonEmptyObject(cursor);
 
         default:
-            throw Error(token, lexer);
+            throw Error(lexer);
     }
 }
 
 void Parser::parseNonEmptyObject(Path::Cursor& cursor) {
-
-    Token token = lexer.getNextToken();
     
-    switch (token) {
+    switch (lexer.getToken()) {
 
         case Token::OBJECT_END:
+            lexer.nextToken();
             break;
-        
+
         case Token::COMMA:
-            expectToken(Token::STRING);
-            expectToken(Token::COLON);
-            if (cursor.isInTarget()) {
-                cursor.next(lexer.getStringValue());
-                onKey(lexer.getStringValue());
-            } else {
-                cursor.next(lexer.getStringValue());
+            lexer.nextToken();
+            {
+                std::string key = std::move(lexer.getStringValue());
+                expectToken(Token::STRING);
+                expectToken(Token::COLON);
+                if (cursor.isInTarget()) {
+                    cursor.next(key);
+                    onKey(key);
+                } else {
+                    cursor.next(key);
+                }
             }
             if (!delegated) {
                 parseValue(cursor);
@@ -139,17 +147,18 @@ void Parser::parseNonEmptyObject(Path::Cursor& cursor) {
             return parseNonEmptyObject(cursor);
 
         default:
-            throw Error(token, lexer);
+            throw Error(lexer);
     }
 }
 
 void Parser::parseArray(Path::Cursor& cursor) {
 
-    Token token = lexer.getNextToken();
+    lexer.nextToken();
 
-    switch (token) {
+    switch (lexer.getToken()) {
 
         case Token::ARRAY_END:
+            lexer.nextToken();
             break;
 
         default:
@@ -160,7 +169,7 @@ void Parser::parseArray(Path::Cursor& cursor) {
                 cursor.next(0);
             }
             if (!delegated) {
-                parseValue(cursor, token);
+                parseValue(cursor);
             }
             delegated = false;
             cursor.prev();
@@ -170,14 +179,14 @@ void Parser::parseArray(Path::Cursor& cursor) {
 
 void Parser::parseNonEmptyArray(Path::Cursor& cursor, size_t index) {
 
-    Token token = lexer.getNextToken();
-    
-    switch (token) {
+    switch (lexer.getToken()) {
 
         case Token::ARRAY_END:
+            lexer.nextToken();
             break;
         
         case Token::COMMA:
+            lexer.nextToken();
             if (cursor.isInTarget()) {
                 cursor.next(index);
                 onIndex(index);
@@ -192,7 +201,7 @@ void Parser::parseNonEmptyArray(Path::Cursor& cursor, size_t index) {
             return parseNonEmptyArray(cursor, index + 1);
 
         default:
-            throw Error(token, lexer);
+            throw Error(lexer);
     }
 }
 

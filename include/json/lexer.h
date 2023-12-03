@@ -73,6 +73,8 @@ private:
     int tokenCharPos, tokenLineNumber;
     bool carriageReturn;
 
+    Token token;
+
     double numberValue;
     std::string stringValue;
     bool booleanValue;
@@ -82,6 +84,8 @@ private:
   
     void getNextNumber(char c);
     void getNextString();
+
+    Token getNextToken();
 
 public:
 
@@ -102,10 +106,15 @@ public:
     void setInput(std::istream& input);
     
     /**
-     * Get the next token from the input stream.
+     * Read the next token from the input stream.
+     */
+    void nextToken();
+
+    /**
+     * Get the last token read from the input stream.
      * If the input stream is not set, Token::END_OF_STREAM is returned.
      */
-    Token getNextToken();
+    Token getToken() const;
 
     /**
      * Get the position of the last character read in the current line.
